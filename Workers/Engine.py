@@ -15,8 +15,8 @@ from sklearn.neighbors import KNeighborsClassifier as knn
 class Engine:
 
     def __init__(self):
-        self.movie_data = MovieData
-        self.user_handler = UserHandler
+        self.movie_data = MovieData.MovieData()
+        self.user_handler = UserHandler.UserHandler()
 
     def collect(self, preferences, user):
         # collects user data from Window class
@@ -28,11 +28,14 @@ class Engine:
         # should return a predicted class that can be used to recall
         # recommended movies from the data set
         # MAY need to transform to np.array
-        #neigh = knn.NearestNeighbors(n_neighbors=10)
-        #neigh.fit(self.movie_data.data[])
-        #get index of k nearest neighbors
-        #neigh.kneighbors(title, return_distance=False)
-        pass
+        # Get the index of the movie that matches the title
+        idx = self.movie_data.indices[title]
+        neigh = knn.NearestNeighbors(n_neighbors=10)
+        neigh.fit(self.movie_data.tfidf_matrix)
+        # Get index of k nearest neighbors
+        kneighbors = neigh.kneighbors(idx, return_distance=False)
+        movie_indices = [i[0] for i in kneighbors]
+        return self.movie_data.data['title'].iloc[movie_indices]
 
     def get_content_recommendations(self, title):
         # Get the index of the movie that matches the title
