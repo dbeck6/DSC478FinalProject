@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import linear_kernel
+from ast import literal_eval
 import os
 
 # Should split the data into sets in this class
@@ -15,7 +16,7 @@ class MovieData:
         self.data_path = os.path.join(os.getcwd(), 'DataStorage')
         self.datafile = pd.read_csv(os.path.join(self.data_path, 'movies_metadata.csv'))
         # Create reduced dimension data set & cosine similarity matrix
-        self.data, self.cosine_sim = self.datafile.preprocess()
+        self.data, self.cosine_sim, self.tfidf_matrix = self.datafile.preprocess()
         # not sure we need a target variable...
         self.target = 'This variable should contain the target data'
         # Construct a reverse map of indices and movie titles
@@ -48,6 +49,8 @@ class MovieData:
         # Merge keywords and credits into dataframe
         data = data.merge(creds, on='id')
         data = data.merge(keywords, on='id')
+        # Parse the stringified features into their corresponding python objects
+
         # Define a TF-IDF Vectorizer Object. Remove all english stop words such as 'the', 'a'
         tfidf = TfidfVectorizer(stop_words='english')
         # Replace NaN with an empty string
@@ -56,7 +59,7 @@ class MovieData:
         tfidf_matrix = tfidf.fit_transform(data['overview'])
         # Compute the cosine similarity matrix
         cosine_sim = linear_kernel(tfidf_matrix, tfidf_matrix)
-        return data, cosine_sim
+        return data, cosine_sim, tfidf_matrix
 
     # still not sure this is needed
     def reassign_target(self, new_target):
@@ -73,6 +76,7 @@ class MovieData:
         r = self['vote_average']
         # Calculation based on the IMDB formula
         return (v / (v + m) * r) + (m / (m + v) * c)
+
 
 
 def test_movie():
