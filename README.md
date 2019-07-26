@@ -1,4 +1,4 @@
-# DSC478FinalProject
+# DSC478FinalProject - Find-A-Film
 
 Final Project for DePaul University DSC478: Machine Learning. 
 
